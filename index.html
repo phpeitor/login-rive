@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rive - Login</title>
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <div class="left">
+      <div class="rive-stage">
+        <canvas id="rive-canvas" width="700" height="700"></canvas>
+      </div>
+    </div>
+    <div class="right">
+      <div class="logo">RIVE</div>
+      <h1>Log in</h1>
+
+      <div class="login-box">
+        <button class="btn-google">Continue with Google</button>
+        <div class="divider">or</div>
+        <input placeholder="email or username" id="email" />
+        <input placeholder="password" id="password" type="password" />
+        <button id="btnLogin" class="btn-primary">Log in</button>
+        <div class="test-actions">
+          <button id="btnTestError" type="button" class="btn-secondary">Probar error</button>
+          <button id="btnTestSuccess" type="button" class="btn-secondary">Probar success</button>
+        </div>
+        <p class="hint">Forgot password? · Use single sign-on</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="./js/rive.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+/* Estilos simples para el ejemplo de login */
+*{box-sizing:border-box;font-family:Inter, Roboto, Arial, sans-serif}
+:root{--rive-purple:#3a2940}
+body{margin:0;background:#fff;color:#222;overflow:hidden}
+.container{display:flex;min-height:100vh;transform-origin:60% 50%}
+.left{flex:1;background:var(--rive-purple);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.rive-stage{width:min(100%,700px);height:min(100%,700px);display:flex;align-items:center;justify-content:center;background:var(--rive-purple);transform-origin:50% 82%;will-change:transform,filter,opacity}
+.right{width:420px;padding:48px 36px}
+.logo{font-size:44px;letter-spacing:8px;text-align:left;margin-bottom:18px}
+h1{margin:0 0 18px;font-size:20px}
+.login-box{max-width:320px}
+.btn-google{display:block;width:100%;padding:12px;background:#eee;border-radius:8px;border:0;margin-bottom:10px}
+.divider{text-align:center;color:#9a9a9a;margin:8px 0}
+input{display:block;width:100%;padding:12px;border-radius:8px;border:1px solid #e6e6e6;margin-bottom:8px}
+.btn-primary{display:block;width:100%;padding:12px;background:#222;color:#fff;border:0;border-radius:8px;margin-top:8px}
+.btn-secondary{display:block;width:100%;padding:11px;background:#f1f1f1;color:#222;border:1px solid #ddd;border-radius:8px;margin-top:8px}
+.test-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.hint{color:#c33;font-size:13px;margin-top:10px}
+
+/* canvas should scale responsively */
+#rive-canvas{max-width:100%;height:auto;background:transparent;will-change:transform,filter,opacity}
+
+.container.is-error .rive-stage{
+	animation: skateFall 780ms cubic-bezier(.12,.78,.18,1) forwards;
+}
+
+.container.is-error #rive-canvas{
+	animation: skateThrowRight 780ms cubic-bezier(.15,.82,.18,1) forwards;
+}
+
+.container.is-success .rive-stage{
+	animation: successPulse 650ms ease-out;
+}
+
+.container.is-error .rive-stage::after{
+	content:'';
+	position:absolute;
+	inset:0;
+	background:linear-gradient(90deg, rgba(255,255,255,0.36) 0%, rgba(255,255,255,0.08) 20%, rgba(255,255,255,0) 58%);
+	opacity:0;
+	pointer-events:none;
+	animation:errorFlash 780ms ease-out forwards;
+	mix-blend-mode:screen;
+}
+
+@keyframes skateFall{
+	0%{transform:translateY(0) rotate(0deg) scale(1);filter:blur(0) saturate(1) brightness(1)}
+	18%{transform:translateY(4px) rotate(-2deg) scale(.997)}
+	36%{transform:translateY(18px) rotate(4deg) scale(.99)}
+	62%{transform:translateY(52px) rotate(-8deg) scale(.955);filter:blur(.2px) saturate(1.08) brightness(1.08)}
+	100%{transform:translateY(92px) rotate(-14deg) scale(.905);filter:blur(1px) saturate(.82) brightness(.88);opacity:.74}
+}
+
+@keyframes skateThrowRight{
+	0%{transform:translateX(0) translateY(0) rotate(0deg) scale(1);opacity:1;filter:blur(0) brightness(1)}
+	16%{transform:translateX(18px) translateY(-2px) rotate(2deg) scale(1.01)}
+	34%{transform:translateX(44px) translateY(4px) rotate(6deg) scale(.995)}
+	58%{transform:translateX(84px) translateY(10px) rotate(11deg) scale(.97);filter:blur(.5px) brightness(1.12)}
+	100%{transform:translateX(148px) translateY(18px) rotate(16deg) scale(.92);opacity:0;filter:blur(2px) brightness(1.2)}
+}
+
+@keyframes successPulse{
+	0%{transform:scale(1)}
+	35%{transform:scale(1.015)}
+	100%{transform:scale(1)}
+}
+
+@keyframes errorFlash{
+	0%{opacity:0}
+	18%{opacity:.95}
+	36%{opacity:.1}
+	52%{opacity:.82}
+	100%{opacity:0}
+}
