@@ -1,24 +1,48 @@
 /* Estilos simples para el ejemplo de login */
 *{box-sizing:border-box;font-family:Inter, Roboto, Arial, sans-serif}
-:root{--rive-purple:#3a2940}
-body{margin:0;background:#fff;color:#222;overflow:hidden}
-.container{display:flex;min-height:100vh;transform-origin:60% 50%}
+:root{--rive-purple:#3a2940;--text:#111827;--muted:#6b7280;--border:#e5e7eb;--surface:#ffffff;--surface-soft:#f8fafc;--shadow:0 28px 80px rgba(15,23,42,.08)}
+body{margin:0;background:#f4f4f5;color:var(--text);overflow:hidden}
+.container{display:flex;min-height:100vh;transform-origin:60% 50%;background:#f4f4f5}
 .left{flex:1;background:var(--rive-purple);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
 .rive-stage{width:min(100%,700px);height:min(100%,700px);display:flex;align-items:center;justify-content:center;background:var(--rive-purple);transform-origin:50% 82%;will-change:transform,filter,opacity}
-.right{width:420px;padding:48px 36px}
-.logo{font-size:44px;letter-spacing:8px;text-align:left;margin-bottom:18px}
-h1{margin:0 0 18px;font-size:20px}
-.login-box{max-width:320px}
-.btn-google{display:block;width:100%;padding:12px;background:#eee;border-radius:8px;border:0;margin-bottom:10px}
-.divider{text-align:center;color:#9a9a9a;margin:8px 0}
-input{display:block;width:100%;padding:12px;border-radius:8px;border:1px solid #e6e6e6;margin-bottom:8px}
-.btn-primary{display:block;width:100%;padding:12px;background:#222;color:#fff;border:0;border-radius:8px;margin-top:8px}
-.btn-secondary{display:block;width:100%;padding:11px;background:#f1f1f1;color:#222;border:1px solid #ddd;border-radius:8px;margin-top:8px}
-.test-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
-.hint{color:#c33;font-size:13px;margin-top:10px}
+.right{width:min(100%,500px);padding:48px 40px;display:flex;align-items:center;justify-content:center;background:var(--surface);border-left:1px solid rgba(17,24,39,.06);box-shadow:var(--shadow);z-index:1}
+.right-inner{width:min(100%,400px)}
+.logo{display:flex;align-items:center;margin-bottom:28px}
+.logo-image{display:block;width:124px;height:auto}
+h1{margin:0 0 18px;font-size:21px;line-height:1.2;font-weight:600;letter-spacing:-.02em;color:var(--text)}
+.login-box{display:flex;flex-direction:column;gap:12px;width:100%}
+.btn-google{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;height:52px;padding:0 18px;background:var(--surface-soft);border-radius:14px;border:1px solid var(--border);color:#374151;box-shadow:0 1px 1px rgba(15,23,42,.02);transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease,background-color .15s ease;cursor:pointer}
+.btn-google:hover{transform:translateY(-1px);box-shadow:0 10px 26px rgba(15,23,42,.06);border-color:#d1d5db;background:#fff}
+.google-icon{width:18px;height:18px;flex:0 0 18px;display:block}
+.divider{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:13px;margin:2px 0 0;text-transform:lowercase}
+.divider::before,.divider::after{content:"";height:1px;flex:1;background:var(--border)}
+.divider span{flex:0 0 auto}
+input{display:block;width:100%;height:46px;padding:0 16px;border-radius:12px;border:1px solid var(--border);background:var(--surface-soft);color:var(--text);font-size:15px;outline:none;transition:border-color .15s ease,box-shadow .15s ease,background-color .15s ease}
+input::placeholder{color:#9ca3af}
+input:focus{border-color:#9ca3af;box-shadow:0 0 0 4px rgba(17,24,39,.05);background:#fff}
+.btn-primary{display:flex;align-items:center;justify-content:center;width:100%;height:52px;background:#262626;color:#fff;border:0;border-radius:14px;font-size:15px;font-weight:600;letter-spacing:.01em;box-shadow:0 12px 28px rgba(17,24,39,.14);cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,background-color .15s ease}
+.btn-primary:hover{transform:translateY(-1px);background:#171717;box-shadow:0 16px 32px rgba(17,24,39,.18)}
+.btn-secondary{display:flex;align-items:center;justify-content:center;width:100%;height:44px;padding:0 14px;background:#f3f4f6;color:#111827;border:1px solid #e5e7eb;border-radius:12px;font-size:14px;cursor:pointer;transition:background-color .15s ease,border-color .15s ease,transform .15s ease}
+.btn-secondary:hover{background:#fff;border-color:#d1d5db;transform:translateY(-1px)}
+.test-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:2px}
+.hint{color:var(--muted);font-size:13px;line-height:1.5;text-align:center;margin:8px 0 0}
 
 /* canvas should scale responsively */
 #rive-canvas{max-width:100%;height:auto;background:transparent;will-change:transform,filter,opacity}
+
+@media (max-width: 1100px){
+	.container{flex-direction:column;overflow:auto}
+	.left{min-height:48vh}
+	.right{width:100%;padding:32px 20px;border-left:0;box-shadow:none}
+	.right-inner{width:min(100%,420px)}
+}
+
+@media (max-width: 640px){
+	.left{min-height:42vh}
+	.rive-stage{width:min(100%,520px);height:min(100%,520px)}
+	.logo-image{width:108px}
+	.test-actions{grid-template-columns:1fr}
+}
 
 .container.is-error .rive-stage{
 	animation: skateFall 780ms cubic-bezier(.12,.78,.18,1) forwards;
