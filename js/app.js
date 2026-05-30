@@ -141,6 +141,53 @@
       autoplay: true,
       stateMachines: [successStateMachineName],
     });
+
+    window.setTimeout(function() {
+      if (!riveInstance || typeof riveInstance.stateMachineInputs !== 'function') {
+        return;
+      }
+
+      var inputs = riveInstance.stateMachineInputs(successStateMachineName) || [];
+      if (!inputs.length) {
+        return;
+      }
+
+      var pullAmountInput = inputs.find(function(input) {
+        return input && input.name === 'pullAmount';
+      });
+      var pullReleaseInput = inputs.find(function(input) {
+        return input && input.name === 'pullRelease';
+      });
+      var loadFinishedInput = inputs.find(function(input) {
+        return input && input.name === 'loadFinished';
+      });
+
+      if (pullAmountInput && typeof pullAmountInput.value !== 'undefined') {
+        pullAmountInput.value = 3.25;
+      }
+
+      if (loadFinishedInput) {
+        if (typeof loadFinishedInput.fire === 'function') {
+          loadFinishedInput.fire();
+        } else if (typeof loadFinishedInput.value !== 'undefined') {
+          loadFinishedInput.value = true;
+        }
+      }
+
+      window.setTimeout(function() {
+        if (pullReleaseInput) {
+          if (typeof pullReleaseInput.fire === 'function') {
+            pullReleaseInput.fire();
+          } else if (typeof pullReleaseInput.value !== 'undefined') {
+            pullReleaseInput.value = true;
+          }
+        }
+
+        if (pullAmountInput && typeof pullAmountInput.value !== 'undefined') {
+          pullAmountInput.value = 4;
+        }
+      }, 160);
+    }, 120);
   }
 
   function setLoginResultAnimation(result) {
