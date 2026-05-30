@@ -18,15 +18,21 @@
     </div>
     <div class="right">
       <div class="right-inner">
+        <!-- Contador visible de sesión (aparece arriba a la derecha sobre el logo) -->
+        <div id="sessionTimer" class="session-timer" aria-live="polite" aria-atomic="true"></div>
         <div class="logo">
           <img src="./resources/rive_logo_black.svg" alt="Rive" class="logo-image" />
         </div>
         <h1>Log in</h1>
 
         <div class="login-box">
-          <button type="button" class="btn-google">
+          <!-- Contenedor para el botón nativo de Google Identity Services -->
+          <div id="gSignInDiv" style="width:100%;"></div>
+
+          <!-- Botón personalizado que inicia el flujo server-side (redirect a php/oauth-start.php) -->
+          <button type="button" id="btnGoogleLocal" class="btn-google">
             <img src="./resources/signin-google.png" alt="Google" class="google-icon" />
-            <span>Continue with Google</span>
+            <span>Continuar con Google</span>
           </button>
           <div class="divider"><span>or</span></div>
           <input placeholder="email or username" id="email" maxlength="35" />
@@ -43,7 +49,7 @@
   </div>
 
   <script src="./js/rive.js"></script>
-  <script src="./js/google-config.js"></script>
+  <script src="./php/google-config.php"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="https://cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
   <script src="./js/app.js"></script>

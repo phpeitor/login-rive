@@ -22,6 +22,7 @@ Este proyecto muestra cómo integrar una animación `.riv` con un formulario de 
 - `css/styles.css`: estilos, layout y animaciones UX.
 - `js/app.js`: lógica del login demo, validaciones y control de estados.
 - `js/rive.js`: runtime JS de Rive.
+- `php/google-config.php`: bridge PHP que expone `GOOGLE_CLIENT_ID` desde `.env`.
 - `resources/`: archivos de animación y assets visuales.
 
 Contenido relevante actual en `resources/`:
@@ -37,13 +38,14 @@ Contenido relevante actual en `resources/`:
 
 ## Cómo funciona
 
-1. `index.html` carga estilos, runtime de Rive y `js/app.js`.
-2. `js/app.js` configura la URL local del WASM (`resources/rive.wasm`).
-3. Se inicializa una instancia de Rive con `marty_purple_loop.riv` y, en `success`, se cambia temporalmente a `animate-success.riv`.
-4. Al interactuar con el formulario se aplican clases de estado en `.container`:
+1. `index.html` carga estilos, runtime de Rive, `php/google-config.php` y `js/app.js`.
+2. `php/google-config.php` publica `GOOGLE_CLIENT_ID` desde `.env` como configuración JavaScript.
+3. `js/app.js` configura la URL local del WASM (`resources/rive.wasm`).
+4. Se inicializa una instancia de Rive con `marty_purple_loop.riv` y, en `success`, se cambia temporalmente a `animate-success.riv`.
+5. Al interactuar con el formulario se aplican clases de estado en `.container`:
 	 - `is-error`
 	 - `is-success`
-5. `css/styles.css` traduce esas clases a efectos visuales del personaje y del stage.
+6. `css/styles.css` traduce esas clases a efectos visuales del personaje y del stage.
 
 ## Reglas de validación en el demo
 
@@ -95,3 +97,4 @@ Edita en `css/styles.css`:
 - Mantén compatibilidad entre `js/rive.js` y `resources/rive.wasm`.
 - Usa una sola instancia de Rive por vista para mejor rendimiento.
 - Si cambias tamaños de layout, mantén `resizeDrawingSurfaceToCanvas()` en `app.js`.
+- Para `.env` en PHP simple, `parse_ini_file()` alcanza; si más adelante hay más variables o capas, usa Composer con `vlucas/phpdotenv`.

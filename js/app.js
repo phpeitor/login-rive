@@ -33,10 +33,11 @@
   var lastNotifyKey = '';
   var googleSignInReady = false;
   var googleOneTapPrompted = false;
+  var googleIdentityInitialized = false;
 
   var emailInput = document.getElementById('email');
   var passwordInput = document.getElementById('password');
-  var googleButton = document.querySelector('.btn-google');
+  var googleButtonHost = document.getElementById('btnGoogleLocal');
 
   function base64UrlDecode(input) {
     var base64 = input.replace(/-/g, '+').replace(/_/g, '/');
@@ -70,26 +71,58 @@
     var name = payload && (payload.name || payload.given_name || payload.email) ? (payload.name || payload.given_name || payload.email) : 'Cuenta Google';
 
     notify('success', 'Bienvenido ' + name + '');
-    alert('Ingreso con Google: ' + name);
+    if (window.alertify && typeof window.alertify.alert === 'function') {
+      window.alertify.alert('Ingreso con Google', 'Ingreso con Google: ' + name);
+      return;
+    }
+
+    window.alert('Ingreso con Google: ' + name);
   }
 
   function handleGoogleCredentialResponse(response) {
     if (!response || !response.credential) {
-      notify('error', 'No se recibió credencial de Google');
+      notify('error', 'No se recibió credencial de Google. Revisa tu sesión en Google o las cookies del navegador.');
       return;
     }
 
-    alertGoogleAccountName(response.credential);
+    // Envío seguro al backend para validación
+    try {
+      fetch('./php/validate-google.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id_token: response.credential }),
+      }).then(function(res) {
+        return res.json().catch(function(){ return { ok: false, error: 'invalid_response' }; });
+      }).then(function(data) {
+        if (data && data.ok) {
+          var name = (data.payload && (data.payload.name || data.payload.email)) ? (data.payload.name || data.payload.email) : 'Cuenta Google';
+          notify('success', 'Bienvenido ' + name);
+          if (window.alertify && typeof window.alertify.alert === 'function') {
+            window.alertify.alert('Ingreso con Google', 'Ingreso con Google: ' + name);
+          } else {
+            alert('Ingreso con Google: ' + name);
+          }
+        } else {
+          notify('error', 'Validación en servidor fallida: ' + (data && data.error ? data.error : 'unknown'));
+        }
+      }).catch(function(err) {
+        console.error('Error validando token en servidor', err);
+        notify('error', 'Error validando token en servidor');
+      });
+    } catch (e) {
+      console.error(e);
+      notify('error', 'Error enviando credencial al servidor');
+    }
   }
 
   function initializeGoogleSignIn() {
     var clientId = window.APP_CONFIG && window.APP_CONFIG.GOOGLE_CLIENT_ID;
 
     if (!clientId || clientId === 'PON_AQUI_TU_GOOGLE_CLIENT_ID') {
-      if (googleButton) {
-        googleButton.title = 'Configura GOOGLE_CLIENT_ID en js/google-config.js';
+      if (googleButtonHost) {
+        googleButtonHost.title = 'Configura GOOGLE_CLIENT_ID en php/google-config.php';
       }
-      console.warn('Falta configurar GOOGLE_CLIENT_ID en js/google-config.js');
+      console.warn('Falta configurar GOOGLE_CLIENT_ID en php/google-config.php');
       return;
     }
 
@@ -98,12 +131,21 @@
       return;
     }
 
-    window.google.accounts.id.initialize({
-      client_id: clientId,
-      callback: handleGoogleCredentialResponse,
-      auto_select: false,
-      cancel_on_tap_outside: true,
-    });
+    if (!googleIdentityInitialized) {
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        callback: handleGoogleCredentialResponse,
+        auto_select: false,
+        cancel_on_tap_outside: true,
+        ux_mode: 'popup',
+      });
+
+      googleIdentityInitialized = true;
+      // Renderizar el botón nativo si el contenedor existe
+      if (typeof renderNativeGoogleButton === 'function') {
+        renderNativeGoogleButton();
+      }
+    }
 
     googleSignInReady = true;
   }
@@ -321,6 +363,111 @@
     });
   }
 
+  if (googleButtonHost) {
+    googleButtonHost.addEventListener('click', function() {
+      // Iniciar flujo server-side (redirect a php/oauth-start.php)
+      try {
+        window.location.href = './php/oauth-start.php';
+      } catch (e) {
+        console.error('No se pudo iniciar el flujo server-side', e);
+        notify('error', 'No se pudo iniciar el flujo con Google.');
+      }
+    });
+  }
+
+  // Renderizar el botón nativo de Google una vez inicializado
+  function renderNativeGoogleButton() {
+    try {
+      var clientId = window.APP_CONFIG && window.APP_CONFIG.GOOGLE_CLIENT_ID;
+      if (!clientId || clientId === 'PON_AQUI_TU_GOOGLE_CLIENT_ID') return;
+      var host = document.getElementById('gSignInDiv');
+      if (!host || !window.google || !window.google.accounts || !window.google.accounts.id) return;
+
+      // Renderiza el botón nativo con ancho completo
+      window.google.accounts.id.renderButton(host, {
+        theme: 'outline',
+        size: 'large',
+        width: '100%'
+      });
+    } catch (e) {
+      console.warn('No se pudo renderizar el botón nativo de Google', e);
+    }
+  }
+
+  // Comprobar si el servidor ya creó una sesión (flujo server-side)
+  var _sessionTimerId = null;
+  function startSessionTimer(seconds) {
+    var remaining = Math.max(0, parseInt(seconds, 10) || 60);
+    var el = document.getElementById('sessionTimer');
+    function formatTime(sec) {
+      var m = Math.floor(sec / 60);
+      var s = sec % 60;
+      return (m > 0 ? m + ':' + (s < 10 ? '0' + s : s) : s + 's');
+    }
+
+    // Mostrar contador en UI
+    if (el) {
+      el.textContent = 'Sesión expira en ' + formatTime(remaining);
+      el.classList.remove('hidden');
+      el.classList.add('visible');
+    }
+
+    // Notificar inicio (opcional)
+    notify('info', 'Sesión activa. Se cerrará en ' + remaining + 's (prueba)');
+
+    // Limpiar any timer previo
+    if (_sessionTimerId) {
+      clearInterval(_sessionTimerId);
+      _sessionTimerId = null;
+    }
+
+    _sessionTimerId = setInterval(function() {
+      remaining--;
+      if (el) el.textContent = 'Sesión expira en ' + formatTime(remaining);
+      if (remaining === 30) notify('info', 'Sesión cerrará en 30s (prueba)');
+      if (remaining === 10) notify('info', 'Sesión cerrará en 10s (prueba)');
+      if (remaining <= 0) {
+        clearInterval(_sessionTimerId);
+        _sessionTimerId = null;
+        if (el) { el.classList.remove('visible'); el.classList.add('hidden'); }
+        // Llamar al endpoint que destruye la sesión en el servidor
+        fetch('./php/logout.php', { method: 'POST', credentials: 'same-origin' })
+          .then(function(res){ return res.json().catch(function(){ return { ok: false }; }); })
+          .then(function(data){
+            if (data && data.ok) {
+              notify('success', 'Sesión destruida (prueba). Recargando...');
+              window.setTimeout(function(){ window.location.reload(); }, 900);
+            } else {
+              notify('error', 'No se pudo destruir la sesión en el servidor');
+            }
+          }).catch(function(err){
+            console.error('Error destruyendo sesión', err);
+            notify('error', 'Error destruyendo la sesión');
+          });
+      }
+    }, 1000);
+  }
+
+  function checkServerSession() {
+    try {
+      fetch('./php/session.php', { credentials: 'same-origin' })
+        .then(function(res){ return res.json().catch(function(){ return { ok: false }; }); })
+        .then(function(data){
+          if (data && data.ok && data.user) {
+            var name = data.user.name || data.user.email || 'Cuenta Google';
+            notify('success', 'Bienvenido ' + name);
+            try { setLoginResultAnimation('success'); } catch(e){}
+            // iniciar temporizador de 60s para pruebas
+            startSessionTimer(60);
+          }
+        }).catch(function(err){
+          console.warn('No fue posible comprobar sesión en servidor', err);
+        });
+    } catch (e) {
+      console.warn('Error iniciando comprobación de sesión', e);
+    }
+  }
+
   // Form handlers mínimos (no hacen autenticación real)
   document.getElementById('btnLogin').addEventListener('click', function(){
     if (!validateRequiredFields()) {
@@ -350,20 +497,7 @@
     setLoginResultAnimation('success');
   });
 
-  if (googleButton) {
-    googleButton.addEventListener('click', function() {
-      if (!googleSignInReady) {
-        initializeGoogleSignIn();
-      }
-
-      if (window.google && window.google.accounts && window.google.accounts.id && googleSignInReady) {
-        window.google.accounts.id.prompt();
-        return;
-      }
-
-      notify('error', 'Google Sign-In no está listo. Revisa GOOGLE_CLIENT_ID.');
-    });
-  }
-
   initializeGoogleSignIn();
+  // Comprobar sesión server-side (para flujo iniciado por el botón CSS)
+  checkServerSession();
 })();

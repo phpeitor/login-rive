@@ -15,15 +15,26 @@ Para que esto funcione de verdad necesitas:
 
 Sin eso, el botón solo puede quedar preparado a nivel de código.
 
+Ten en cuenta también que en algunos navegadores, especialmente Firefox con restricciones de cookies o sin sesión activa de Google, el flujo puede no mostrar cuentas disponibles hasta que el usuario inicie sesión o permita el acceso necesario.
+
 ## Variables de entorno
 
-En un frontend estático el navegador no puede leer un `.env` directamente. Por eso en este proyecto usamos `js/google-config.js` como puente de configuración.
+El navegador no puede leer `.env` directamente. En este proyecto usamos un bridge PHP para leer el archivo `.env` y exponer solo el `GOOGLE_CLIENT_ID` al frontend.
 
 La idea es:
 
-- guardar tu valor real en `.env` durante desarrollo o en tu sistema de despliegue;
-- inyectarlo después en `js/google-config.js` o generar ese archivo desde tu backend/build step;
-- nunca dejar el `client_id` hardcodeado en código de producción si vas a automatizar el despliegue.
+- guardar tu valor real en `.env`;
+- servir un archivo PHP que lea ese valor y lo convierta en configuración JavaScript;
+- nunca dejar el `client_id` hardcodeado en el frontend.
+
+Implementación actual:
+
+- `php/google-config.php`
+
+Nota sobre Composer:
+
+- para este caso simple, `parse_ini_file()` es suficiente si tu `.env` es solo clave-valor;
+- si el proyecto crece, lo recomendable es usar `vlucas/phpdotenv` con Composer.
 
 Archivo de referencia incluido en el proyecto:
 
@@ -60,12 +71,18 @@ Agregar el script oficial de Google Identity Services:
 Y cargar la configuración antes de `app.js`:
 
 ```html
-<script src="./js/google-config.js"></script>
+<script src="./php/google-config.php"></script>
+```
+
+En el markup puedes usar tu botón visual local como disparador del flujo:
+
+```html
+<button type="button" id="btnGoogleLocal" class="btn-google">Continue with Google</button>
 ```
 
 ### 2) `js/app.js`
 
-Crear la inicialización del botón y el callback de credential.
+Crear la inicialización de Google Identity Services y conectar tu botón local al `prompt()`.
 
 Ejemplo base:
 
@@ -79,18 +96,12 @@ function initializeGoogleSignIn() {
   window.google.accounts.id.initialize({
     client_id: 'TU_GOOGLE_CLIENT_ID',
     callback: handleGoogleCredentialResponse,
+    ux_mode: 'popup',
   });
 
-  window.google.accounts.id.renderButton(
-    document.querySelector('.btn-google'),
-    {
-      theme: 'outline',
-      size: 'large',
-      text: 'continue_with',
-      shape: 'pill',
-      width: 380,
-    }
-  );
+  document.getElementById('btnGoogleLocal').addEventListener('click', function() {
+    window.google.accounts.id.prompt();
+  });
 }
 
 function handleGoogleCredentialResponse(response) {
@@ -109,19 +120,7 @@ En este proyecto ya está implementado un callback demo que:
 
 ## Cómo encajarlo con tu login actual
 
-Tienes dos opciones:
-
-### Opción A: usar el botón visual que ya tienes
-
-- Mantienes tu botón actual.
-- Al hacer clic, disparas `google.accounts.id.prompt()`.
-- Es útil si quieres conservar la UI personalizada.
-
-### Opción B: renderizar el botón oficial de Google
-
-- Google dibuja el botón real.
-- Es más seguro para cumplir branding/UI.
-- Es lo más recomendado si vas a producción.
+En este proyecto puedes conservar el botón visual local y usar GIS por detrás con `prompt()`. Si necesitas cumplimiento visual estricto de Google, cambia luego a `renderButton()`.
 
 ## Recomendación técnica
 
@@ -134,12 +133,14 @@ Para un proyecto serio usa esta arquitectura:
 
 Nunca confíes solo en el token del frontend.
 
+Si quieres comportamiento más consistente entre Chrome y Firefox, el botón oficial renderizado por Google suele ser más estable que depender solo de `prompt()`.
+
 ## En este proyecto
 
 El botón actual `Continue with Google` puede ser el disparador visual, pero la lógica real debería vivir así:
 
 - `index.html`: carga el script de Google;
-- `js/app.js`: inicializa Google Sign-In;
+- `js/app.js`: inicializa Google Sign-In y dispara `prompt()` desde tu botón local;
 - `backend`: valida el JWT y autentica.
 
 ## Qué necesito para implementarlo completo
@@ -157,7 +158,7 @@ Si quieres que yo te lo deje listo dentro del proyecto, necesito:
 
 Ya quedó un flujo de demo frontend con:
 
-- `js/google-config.js` para el `client_id`;
+- `php/google-config.php` para el `client_id`;
 - `index.html` cargando el script de Google;
 - `js/app.js` inicializando GIS y mostrando el nombre de la cuenta en un `alert`.
 

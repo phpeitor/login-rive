@@ -34,9 +34,19 @@ Documento breve con normas prácticas para trabajar en este proyecto frontend.
    - Usar linters y formateadores locales si están disponibles (ESLint/Prettier recomendado).
    - Mensajes de commit descriptivos: `feat:`, `fix:`, `chore:`.
 
-8. Pruebas manuales rápidas
+8. Integración con backend
+   - El frontend no debe leer secretos ni `.env` directamente.
+   - La configuración pública puede exponerse desde PHP o backend, pero solo con valores no sensibles.
+   - Las rutas de bridge o configuración no deben vivir dentro de `js/` si contienen lógica de servidor.
+
+9. Integración con Google Sign-In
+   - Se puede conservar un botón local visual, pero el flujo debe seguir dependiendo de Google Identity Services.
+   - Si el navegador no tiene sesión activa o bloquea cookies, dejar que Google maneje el login y mostrar un mensaje claro con Alertify solo si falla la devolución del credential.
+   - No depender de `alert()` nativo para el feedback de autenticación.
+
+10. Pruebas manuales rápidas
    - Comprobar en mobile y desktop.
    - Verificar carga de recursos desde `resources/` y comportamiento al fallar la carga.
 
-9. Notas finales
+11. Notas finales
    - Estos son lineamientos mínimos. Para cambios mayores, crear una propuesta y documentarla en el repo.

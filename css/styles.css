@@ -6,11 +6,20 @@ body{margin:0;background:#f4f4f5;color:var(--text);overflow:hidden}
 .left{flex:1;background:var(--rive-purple);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
 .rive-stage{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--rive-purple);transform-origin:50% 82%;will-change:transform,filter,opacity;position:relative}
 .right{width:min(100%,500px);padding:48px 40px;display:flex;align-items:center;justify-content:center;background:var(--surface);border-left:0;box-shadow:var(--shadow);z-index:1}
+.right{position:relative}
 .right-inner{width:min(100%,400px)}
 .logo{display:flex;align-items:center;margin-bottom:36px;transform:none}
 .logo-image{display:block;width:220px;height:auto}
 h1{margin:0 0 18px;font-size:21px;line-height:1.2;font-weight:600;letter-spacing:-.02em;color:var(--text)}
 .login-box{display:flex;flex-direction:column;gap:12px;width:100%}
+.gsi-container{width:100%}
+#gSignInDiv{width:100%;margin-bottom:6px}
+
+/* Estilos para el contador de sesión (temporizador) */
+.session-timer{position:absolute;top:16px;right:20px;background:rgba(16,185,129,0.92);color:#fff;padding:10px 14px;border-radius:8px;font-weight:600;font-size:14px;box-shadow:0 8px 20px rgba(17,24,39,.12);display:none;z-index:20;text-align:center;min-width:160px}
+.session-timer.small{font-size:13px;padding:8px 10px;min-width:120px}
+.session-timer.hidden{display:none}
+.session-timer.visible{display:block}
 .btn-google{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;height:52px;padding:0 18px;background:var(--surface-soft);border-radius:14px;border:1px solid var(--border);color:#374151;box-shadow:0 1px 1px rgba(15,23,42,.02);transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease,background-color .15s ease;cursor:pointer}
 .btn-google:hover{transform:translateY(-1px);box-shadow:0 10px 26px rgba(15,23,42,.06);border-color:#d1d5db;background:#fff}
 .google-icon{width:18px;height:18px;flex:0 0 18px;display:block}
