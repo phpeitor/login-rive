@@ -3,6 +3,9 @@
 [![forthebadge](https://forthebadge.com/badges/built-with-love.svg)](https://www.linkedin.com/in/drphp/)
 
 
+<video controls playsinline width="100%" src="https://cdn.dribbble.com/userupload/29673298/file/large-162d734489941f8946d6a79fadfd71b2.mp4"></video>
+
+
 Demo local de login UI animado con Rive, enfocado en UX visual para estados de autenticación (`idle`, `error`, `success`).
 
 ## Objetivo
