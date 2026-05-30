@@ -1,67 +1,93 @@
-# Login Rive ®️
-
+# Login Rive
 [![forthebadge](https://forthebadge.com/badges/made-with-javascript.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/badges/built-with-love.svg)](https://www.linkedin.com/in/drphp/)
 
-Pequeño proyecto demo que muestra un formulario de login con animaciones hechas en Rive. Está pensado para servirse desde un servidor local (por ejemplo Apache) y para desarrollo rápido.
+
+Demo local de login UI animado con Rive, enfocado en UX visual para estados de autenticación (`idle`, `error`, `success`).
+
+## Objetivo
+
+Este proyecto muestra cómo integrar una animación `.riv` con un formulario de login en frontend puro (HTML, CSS y JavaScript), incluyendo:
+
+- validación visual de campos;
+- feedback de error y éxito con animaciones del personaje;
+- notificaciones con Alertify para mensajes de resultado.
 
 ## Estructura del proyecto
 
-- `index.html` — página principal del demo.
-- `css/` — hojas de estilo (p. ej. `css/styles.css`).
-- `js/` — scripts de la app y runtime (p. ej. `js/app.js`, `js/rive.js`).
-- `resources/` — archivos `.riv` y otros recursos de animación.
+- `index.html`: entrada principal del demo.
+- `css/styles.css`: estilos, layout y animaciones UX.
+- `js/app.js`: lógica del login demo, validaciones y control de estados.
+- `js/rive.js`: runtime JS de Rive.
+- `resources/`: archivos de animación y assets visuales.
 
-Ejemplo de archivos en esta copia:
+Contenido relevante actual en `resources/`:
 
-- `index.html`
-- `css/styles.css`
-- `js/app.js`, `js/rive.js`
-- `resources/marty_purple_loop.riv`, `resources/reactions_v3.riv`, `resources/popout.riv`
+- `marty_purple_loop.riv`
+- `reactions_v3.riv`
+- `popout.riv`
+- `open-in-rive.riv`
+- `rive.wasm`
+- `rive_logo_black.svg`
+- `signin-google.png`
 
-## Qué hace cada parte
+## Cómo funciona
 
-- `login.html`: carga los estilos y los scripts desde `css/` y `js/`, y contiene el markup del formulario y el contenedor donde se renderiza Rive.
-- `css/styles.css`: estilos del layout, clases de estado (`is-error`, `is-success`) y reglas responsivas.
-- `js/app.js`: inicializa el runtime de Rive (desde `js/rive.js`), crea la instancia y controla los estados del login.
-- `js/rive.js`: runtime JavaScript de Rive incluido en el repositorio.
-- `resources/*.riv`: archivos de animación usados por la demo.
+1. `index.html` carga estilos, runtime de Rive y `js/app.js`.
+2. `js/app.js` configura la URL local del WASM (`resources/rive.wasm`).
+3. Se inicializa una instancia de Rive con `marty_purple_loop.riv`.
+4. Al interactuar con el formulario se aplican clases de estado en `.container`:
+	 - `is-error`
+	 - `is-success`
+5. `css/styles.css` traduce esas clases a efectos visuales del personaje y del stage.
 
-## Flujo de carga (resumen)
+## Reglas de validación en el demo
 
-1. Abrir `index.html` mediante servidor local (p. ej. http://localhost/login-rive/index.html).
-2. `login.html` carga `js/rive.js` y `js/app.js`.
-3. `js/app.js` crea la instancia de Rive y carga un `.riv` desde `resources/`.
-4. Las interacciones del formulario disparan cambios visuales (clases CSS o llamadas a la API de Rive).
+- Si los campos están vacíos:
+	- se marcan con borde de error;
+	- no se dispara animación de error;
+	- no se muestra notificación Alertify.
+- Si los campos tienen datos pero no cumplen validación:
+	- se dispara estado `error`;
+	- se muestra notificación `error`.
+- Si el login pasa validación demo:
+	- se dispara estado `success` con animación reforzada;
+	- se muestra notificación `success`.
 
-## Cómo cambiar la animación
+Validación demo actual:
 
-En `js/app.js` actualiza la ruta al `.riv` que quieras usar, por ejemplo:
+- email debe contener `@`
+- password debe tener al menos 4 caracteres
+
+## Ejecución local
+
+Sirve el proyecto desde un servidor local (Apache, Nginx, `live-server`, etc.) y abre:
+
+- `http://127.0.0.1/login-rive/`
+
+También funciona con rutas equivalentes como:
+
+- `http://localhost/login-rive/`
+
+## Personalización rápida
+
+### Cambiar animación principal
+
+Edita en `js/app.js`:
 
 ```js
 src: './resources/marty_purple_loop.riv'
 ```
 
-Si agregas nuevos archivos a `resources/`, referencia la ruta relativa desde `login.html` o `js/app.js`.
+### Ajustar intensidad visual de estados
 
-## Buenas prácticas recomendadas
+Edita en `css/styles.css`:
 
-- Mantén una sola instancia de Rive por página y controla estados vía clases CSS o state machines.
-- Separa responsabilidades: estilos en `css/`, lógica en `js/`, assets en `resources/`.
-- Asegura que la versión del runtime (`js/rive.js`) sea compatible con los `.riv` que uses.
+- `@keyframes error...` para feedback de error.
+- `@keyframes success...` para feedback de éxito.
 
-Para reglas y convenciones de frontend, consulta `REGLAS_FRONTEND.md`.
+## Notas técnicas
 
-## Desarrollo local
-
-1. Sirve el proyecto con tu servidor local (Apache, `live-server`, etc.).
-2. Abre `http://localhost/.../index.html`.
-3. Edita `css/styles.css` y `js/app.js` y recarga para ver cambios.
-
-## Archivos relacionados
-
-- [index.html](index.html)
-- [js/app.js](js/app.js)
-- [css/styles.css](css/styles.css)
-- [js/rive.js](js/rive.js)
-- [resources/](resources/)
+- Mantén compatibilidad entre `js/rive.js` y `resources/rive.wasm`.
+- Usa una sola instancia de Rive por vista para mejor rendimiento.
+- Si cambias tamaños de layout, mantén `resizeDrawingSurfaceToCanvas()` en `app.js`.
