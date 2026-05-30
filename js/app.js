@@ -64,6 +64,13 @@
 
   // Crear el canvas y cargar la animación
   const canvas = document.getElementById('rive-canvas');
+
+  function resizeRiveSurface() {
+    if (riveInstance && typeof riveInstance.resizeDrawingSurfaceToCanvas === 'function') {
+      riveInstance.resizeDrawingSurfaceToCanvas();
+    }
+  }
+
   try {
     riveInstance = new riveNamespace.Rive({
       src: './resources/marty_purple_loop.riv',
@@ -71,15 +78,20 @@
       autoplay: true,
       stateMachines: ['Loop'],
       layout: new riveNamespace.Layout({
-        fit: riveNamespace.Fit.Cover,
+        fit: riveNamespace.Fit.Contain,
         alignment: riveNamespace.Alignment.Center,
       }),
+      onLoad: function() {
+        resizeRiveSurface();
+      },
     });
     // Guardar por si se necesita controlar desde consola
     window._riveInstance = riveInstance;
   } catch (err) {
     console.error('Error cargando Rive:', err);
   }
+
+  window.addEventListener('resize', resizeRiveSurface);
 
   // Form handlers mínimos (no hacen autenticación real)
   document.getElementById('btnLogin').addEventListener('click', function(){
