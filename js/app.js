@@ -25,6 +25,10 @@
 
   var riveInstance = null;
   var resetStateTimer = null;
+  var currentRiveSrc = '';
+  var baseRiveSrc = './resources/marty_purple_loop.riv';
+  var successRiveSrc = './resources/animate-success.riv';
+  var successRiveAnimations = ['Pull Start', 'Pull Over', 'Pull End'];
   var lastNotifyAt = 0;
   var lastNotifyKey = '';
 
@@ -82,6 +86,63 @@
     }
   }
 
+  function disposeRiveInstance() {
+    if (!riveInstance) {
+      return;
+    }
+
+    try {
+      if (typeof riveInstance.cleanup === 'function') {
+        riveInstance.cleanup();
+      } else if (typeof riveInstance.destroy === 'function') {
+        riveInstance.destroy();
+      } else if (typeof riveInstance.stop === 'function') {
+        riveInstance.stop();
+      }
+    } catch (e) {
+      console.warn('No se pudo limpiar la instancia anterior de Rive', e);
+    }
+
+    riveInstance = null;
+  }
+
+  function createRiveInstance(src, options) {
+    var config = options || {};
+
+    disposeRiveInstance();
+
+    riveInstance = new riveNamespace.Rive({
+      src: src,
+      canvas: canvas,
+      autoplay: config.autoplay !== false,
+      animations: config.animations,
+      stateMachines: config.stateMachines,
+      layout: new riveNamespace.Layout({
+        fit: riveNamespace.Fit.Contain,
+        alignment: riveNamespace.Alignment.Center,
+      }),
+      onLoad: function() {
+        resizeRiveSurface();
+      },
+    });
+
+    currentRiveSrc = src;
+    window._riveInstance = riveInstance;
+  }
+
+  function loadBaseCharacter() {
+    createRiveInstance(baseRiveSrc, {
+      stateMachines: ['Loop'],
+    });
+  }
+
+  function loadSuccessCharacter() {
+    createRiveInstance(successRiveSrc, {
+      autoplay: true,
+      animations: successRiveAnimations,
+    });
+  }
+
   function setLoginResultAnimation(result) {
     var container = document.querySelector('.container');
     if (!container) {
@@ -92,6 +153,9 @@
     clearTransientState();
 
     if (result === 'error') {
+      if (currentRiveSrc !== baseRiveSrc) {
+        loadBaseCharacter();
+      }
       container.classList.add('is-error');
       if (riveInstance && typeof riveInstance.play === 'function') {
         riveInstance.play(['Wobble']);
@@ -102,10 +166,11 @@
 
     if (result === 'success') {
       container.classList.add('is-success');
-      if (riveInstance && typeof riveInstance.play === 'function') {
-        riveInstance.play(['Idle']);
-      }
-      resetStateTimer = window.setTimeout(clearTransientState, 1650);
+      loadSuccessCharacter();
+      resetStateTimer = window.setTimeout(function() {
+        clearTransientState();
+        loadBaseCharacter();
+      }, 2200);
     }
   }
 
@@ -121,21 +186,7 @@
   }
 
   try {
-    riveInstance = new riveNamespace.Rive({
-      src: './resources/marty_purple_loop.riv',
-      canvas: canvas,
-      autoplay: true,
-      stateMachines: ['Loop'],
-      layout: new riveNamespace.Layout({
-        fit: riveNamespace.Fit.Contain,
-        alignment: riveNamespace.Alignment.Center,
-      }),
-      onLoad: function() {
-        resizeRiveSurface();
-      },
-    });
-    // Guardar por si se necesita controlar desde consola
-    window._riveInstance = riveInstance;
+    loadBaseCharacter();
   } catch (err) {
     console.error('Error cargando Rive:', err);
   }

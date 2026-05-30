@@ -27,6 +27,7 @@ Este proyecto muestra cómo integrar una animación `.riv` con un formulario de 
 Contenido relevante actual en `resources/`:
 
 - `marty_purple_loop.riv`
+- `animate-success.riv`
 - `reactions_v3.riv`
 - `popout.riv`
 - `open-in-rive.riv`
@@ -38,7 +39,7 @@ Contenido relevante actual en `resources/`:
 
 1. `index.html` carga estilos, runtime de Rive y `js/app.js`.
 2. `js/app.js` configura la URL local del WASM (`resources/rive.wasm`).
-3. Se inicializa una instancia de Rive con `marty_purple_loop.riv`.
+3. Se inicializa una instancia de Rive con `marty_purple_loop.riv` y, en `success`, se cambia temporalmente a `animate-success.riv`.
 4. Al interactuar con el formulario se aplican clases de estado en `.container`:
 	 - `is-error`
 	 - `is-success`
