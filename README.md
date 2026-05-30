@@ -2,11 +2,11 @@
 [![forthebadge](https://forthebadge.com/badges/made-with-javascript.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/badges/built-with-love.svg)](https://www.linkedin.com/in/drphp/)
 
-
-<video controls playsinline width="100%" src="https://cdn.dribbble.com/userupload/29673298/file/large-162d734489941f8946d6a79fadfd71b2.mp4"></video>
-
-
 Demo local de login UI animado con Rive, enfocado en UX visual para estados de autenticación (`idle`, `error`, `success`).
+
+![Login Rive preview](https://www.nepaltraveladventure.com/blog/wp-content/uploads/2020/12/download-1.png)
+
+Nota: GitHub no muestra videos MP4 embebidos de forma confiable dentro de `README.md`; por eso aquí va como enlace directo.
 
 ## Objetivo
 
