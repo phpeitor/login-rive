@@ -1,14 +1,14 @@
 /* Estilos simples para el ejemplo de login */
 *{box-sizing:border-box;font-family:Inter, Roboto, Arial, sans-serif}
-:root{--rive-purple:#3a2940;--text:#111827;--muted:#6b7280;--border:#e5e7eb;--surface:#ffffff;--surface-soft:#f8fafc;--shadow:0 28px 80px rgba(15,23,42,.08)}
+:root{--rive-purple:#3a2940;--text:#111827;--muted:#6b7280;--border:#e5e7eb;--surface:#ffffff;--surface-soft:#f8fafc;--shadow:none}
 body{margin:0;background:#f4f4f5;color:var(--text);overflow:hidden}
 .container{display:flex;min-height:100vh;transform-origin:60% 50%;background:#f4f4f5}
 .left{flex:1;background:var(--rive-purple);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-.rive-stage{width:min(100%,700px);height:min(100%,700px);display:flex;align-items:center;justify-content:center;background:var(--rive-purple);transform-origin:50% 82%;will-change:transform,filter,opacity}
-.right{width:min(100%,500px);padding:48px 40px;display:flex;align-items:center;justify-content:center;background:var(--surface);border-left:1px solid rgba(17,24,39,.06);box-shadow:var(--shadow);z-index:1}
+.rive-stage{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--rive-purple);transform-origin:50% 82%;will-change:transform,filter,opacity}
+.right{width:min(100%,500px);padding:48px 40px;display:flex;align-items:center;justify-content:center;background:var(--surface);border-left:0;box-shadow:var(--shadow);z-index:1}
 .right-inner{width:min(100%,400px)}
-.logo{display:flex;align-items:center;margin-bottom:28px}
-.logo-image{display:block;width:124px;height:auto}
+.logo{display:flex;align-items:center;margin-bottom:34px;transform:none}
+.logo-image{display:block;width:176px;height:auto}
 h1{margin:0 0 18px;font-size:21px;line-height:1.2;font-weight:600;letter-spacing:-.02em;color:var(--text)}
 .login-box{display:flex;flex-direction:column;gap:12px;width:100%}
 .btn-google{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;height:52px;padding:0 18px;background:var(--surface-soft);border-radius:14px;border:1px solid var(--border);color:#374151;box-shadow:0 1px 1px rgba(15,23,42,.02);transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease,background-color .15s ease;cursor:pointer}
@@ -28,7 +28,7 @@ input:focus{border-color:#9ca3af;box-shadow:0 0 0 4px rgba(17,24,39,.05);backgro
 .hint{color:var(--muted);font-size:13px;line-height:1.5;text-align:center;margin:8px 0 0}
 
 /* canvas should scale responsively */
-#rive-canvas{max-width:100%;height:auto;background:transparent;will-change:transform,filter,opacity}
+#rive-canvas{max-width:100%;height:auto;background:var(--rive-purple);will-change:transform,filter,opacity}
 
 @media (max-width: 1100px){
 	.container{flex-direction:column;overflow:auto}
@@ -40,7 +40,7 @@ input:focus{border-color:#9ca3af;box-shadow:0 0 0 4px rgba(17,24,39,.05);backgro
 @media (max-width: 640px){
 	.left{min-height:42vh}
 	.rive-stage{width:min(100%,520px);height:min(100%,520px)}
-	.logo-image{width:108px}
+	.logo-image{width:150px}
 	.test-actions{grid-template-columns:1fr}
 }
 
