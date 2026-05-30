@@ -31,9 +31,82 @@
   var successStateMachineName = 'Reload';
   var lastNotifyAt = 0;
   var lastNotifyKey = '';
+  var googleSignInReady = false;
+  var googleOneTapPrompted = false;
 
   var emailInput = document.getElementById('email');
   var passwordInput = document.getElementById('password');
+  var googleButton = document.querySelector('.btn-google');
+
+  function base64UrlDecode(input) {
+    var base64 = input.replace(/-/g, '+').replace(/_/g, '/');
+    while (base64.length % 4) {
+      base64 += '=';
+    }
+    try {
+      return decodeURIComponent(Array.prototype.map.call(atob(base64), function(char) {
+        return '%' + ('00' + char.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+    } catch (e) {
+      return atob(base64);
+    }
+  }
+
+  function parseJwtPayload(token) {
+    var parts = (token || '').split('.');
+    if (parts.length < 2) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(base64UrlDecode(parts[1]));
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function alertGoogleAccountName(credential) {
+    var payload = parseJwtPayload(credential);
+    var name = payload && (payload.name || payload.given_name || payload.email) ? (payload.name || payload.given_name || payload.email) : 'Cuenta Google';
+
+    notify('success', 'Bienvenido ' + name + '');
+    alert('Ingreso con Google: ' + name);
+  }
+
+  function handleGoogleCredentialResponse(response) {
+    if (!response || !response.credential) {
+      notify('error', 'No se recibió credencial de Google');
+      return;
+    }
+
+    alertGoogleAccountName(response.credential);
+  }
+
+  function initializeGoogleSignIn() {
+    var clientId = window.APP_CONFIG && window.APP_CONFIG.GOOGLE_CLIENT_ID;
+
+    if (!clientId || clientId === 'PON_AQUI_TU_GOOGLE_CLIENT_ID') {
+      if (googleButton) {
+        googleButton.title = 'Configura GOOGLE_CLIENT_ID en js/google-config.js';
+      }
+      console.warn('Falta configurar GOOGLE_CLIENT_ID en js/google-config.js');
+      return;
+    }
+
+    if (!window.google || !window.google.accounts || !window.google.accounts.id) {
+      window.setTimeout(initializeGoogleSignIn, 250);
+      return;
+    }
+
+    window.google.accounts.id.initialize({
+      client_id: clientId,
+      callback: handleGoogleCredentialResponse,
+      auto_select: false,
+      cancel_on_tap_outside: true,
+    });
+
+    googleSignInReady = true;
+  }
 
   function markFieldInvalid(field, isInvalid) {
     if (!field) {
@@ -276,4 +349,21 @@
   document.getElementById('btnTestSuccess').addEventListener('click', function(){
     setLoginResultAnimation('success');
   });
+
+  if (googleButton) {
+    googleButton.addEventListener('click', function() {
+      if (!googleSignInReady) {
+        initializeGoogleSignIn();
+      }
+
+      if (window.google && window.google.accounts && window.google.accounts.id && googleSignInReady) {
+        window.google.accounts.id.prompt();
+        return;
+      }
+
+      notify('error', 'Google Sign-In no está listo. Revisa GOOGLE_CLIENT_ID.');
+    });
+  }
+
+  initializeGoogleSignIn();
 })();
