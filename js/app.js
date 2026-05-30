@@ -28,7 +28,7 @@
   var currentRiveSrc = '';
   var baseRiveSrc = './resources/marty_purple_loop.riv';
   var successRiveSrc = './resources/animate-success.riv';
-  var successRiveAnimations = ['Pull Start', 'Pull Over', 'Pull End'];
+  var successStateMachineName = 'Reload';
   var lastNotifyAt = 0;
   var lastNotifyKey = '';
 
@@ -139,7 +139,7 @@
   function loadSuccessCharacter() {
     createRiveInstance(successRiveSrc, {
       autoplay: true,
-      animations: successRiveAnimations,
+      stateMachines: [successStateMachineName],
     });
   }
 
@@ -167,10 +167,6 @@
     if (result === 'success') {
       container.classList.add('is-success');
       loadSuccessCharacter();
-      resetStateTimer = window.setTimeout(function() {
-        clearTransientState();
-        loadBaseCharacter();
-      }, 2200);
     }
   }
 
