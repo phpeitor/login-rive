@@ -1,4 +1,7 @@
-# Demo local de login con Rive
+# Login Rive ®️
+
+[![forthebadge](https://forthebadge.com/badges/made-with-javascript.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/badges/built-with-love.svg)](https://www.linkedin.com/in/drphp/)
 
 Pequeño proyecto demo que muestra un formulario de login con animaciones hechas en Rive. Está pensado para servirse desde un servidor local (por ejemplo Apache) y para desarrollo rápido.
 

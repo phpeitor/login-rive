@@ -36,10 +36,21 @@ input.is-invalid{border-color:#ef4444;box-shadow:0 0 0 3px rgba(239, 68, 68, .16
 	position:absolute;
 	inset:0;
 	pointer-events:none;
-	background:radial-gradient(circle at 50% 38%, rgba(255,255,255,.58) 0%, rgba(110, 231, 183, .36) 26%, rgba(16,185,129,.2) 42%, rgba(0,0,0,0) 70%);
+	background:radial-gradient(circle at 50% 36%, rgba(255,255,255,.68) 0%, rgba(110, 231, 183, .44) 24%, rgba(16,185,129,.25) 40%, rgba(0,0,0,0) 72%);
 	opacity:0;
-	animation:successCharacterFlash 700ms ease-out;
+	animation:successCharacterFlash 900ms ease-out;
 	mix-blend-mode:screen;
+}
+
+.container.is-success .rive-stage::after{
+	content:'';
+	position:absolute;
+	inset:12% 18%;
+	border:2px solid rgba(52, 211, 153, .76);
+	border-radius:24px;
+	opacity:0;
+	pointer-events:none;
+	animation:successRingPulse 900ms cubic-bezier(.16,.84,.24,1);
 }
 
 @media (max-width: 1100px){
@@ -77,11 +88,11 @@ input.is-invalid{border-color:#ef4444;box-shadow:0 0 0 3px rgba(239, 68, 68, .16
 }
 
 .container.is-success .rive-stage{
-	animation: successPulse 650ms ease-out, successStageGlow 700ms ease-out;
+	animation: successPulse 900ms cubic-bezier(.16,.84,.24,1), successStageGlow 900ms ease-out;
 }
 
 .container.is-success #rive-canvas{
-	animation: successCanvasPop 700ms cubic-bezier(.16,.84,.24,1);
+	animation: successCanvasPop 900ms cubic-bezier(.16,.84,.24,1);
 }
 
 .container.is-error .rive-stage::after{
@@ -112,9 +123,11 @@ input.is-invalid{border-color:#ef4444;box-shadow:0 0 0 3px rgba(239, 68, 68, .16
 }
 
 @keyframes successPulse{
-	0%{transform:scale(1)}
-	35%{transform:scale(1.022)}
-	100%{transform:scale(1)}
+	0%{transform:translateY(0) rotate(0deg) scale(1)}
+	20%{transform:translateY(-18px) rotate(-2.4deg) scale(1.035)}
+	42%{transform:translateY(-4px) rotate(1.6deg) scale(1.01)}
+	65%{transform:translateY(-10px) rotate(-.8deg) scale(1.02)}
+	100%{transform:translateY(0) rotate(0deg) scale(1)}
 }
 
 @keyframes successStageGlow{
@@ -124,9 +137,16 @@ input.is-invalid{border-color:#ef4444;box-shadow:0 0 0 3px rgba(239, 68, 68, .16
 }
 
 @keyframes successCanvasPop{
-	0%{filter:saturate(1) brightness(1)}
-	35%{filter:saturate(1.24) brightness(1.14)}
-	100%{filter:saturate(1) brightness(1)}
+	0%{transform:translateY(0) scale(1);filter:saturate(1) brightness(1)}
+	24%{transform:translateY(-14px) scale(1.03);filter:saturate(1.35) brightness(1.16)}
+	52%{transform:translateY(-3px) scale(1.01);filter:saturate(1.16) brightness(1.08)}
+	100%{transform:translateY(0) scale(1);filter:saturate(1) brightness(1)}
+}
+
+@keyframes successRingPulse{
+	0%{opacity:0;transform:scale(.9);box-shadow:0 0 0 0 rgba(52, 211, 153, 0)}
+	35%{opacity:1;transform:scale(1);box-shadow:0 0 0 24px rgba(52, 211, 153, .2)}
+	100%{opacity:0;transform:scale(1.05);box-shadow:0 0 0 42px rgba(52, 211, 153, 0)}
 }
 
 @keyframes errorStageAlarm{

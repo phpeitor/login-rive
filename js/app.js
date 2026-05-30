@@ -105,7 +105,7 @@
       if (riveInstance && typeof riveInstance.play === 'function') {
         riveInstance.play(['Idle']);
       }
-      resetStateTimer = window.setTimeout(clearTransientState, 1200);
+      resetStateTimer = window.setTimeout(clearTransientState, 1650);
     }
   }
 
@@ -157,8 +157,7 @@
   // Form handlers mínimos (no hacen autenticación real)
   document.getElementById('btnLogin').addEventListener('click', function(){
     if (!validateRequiredFields()) {
-      setLoginResultAnimation('error');
-      notify('error', 'Completa email y password');
+      clearTransientState();
       return;
     }
 
@@ -177,6 +176,7 @@
 
   document.getElementById('btnTestError').addEventListener('click', function(){
     setLoginResultAnimation('error');
+    notify('error', 'Login fallido: revisa correo y contraseña');
   });
 
   document.getElementById('btnTestSuccess').addEventListener('click', function(){
