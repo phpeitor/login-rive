@@ -25,6 +25,55 @@
 
   var riveInstance = null;
   var resetStateTimer = null;
+  var lastNotifyAt = 0;
+  var lastNotifyKey = '';
+
+  var emailInput = document.getElementById('email');
+  var passwordInput = document.getElementById('password');
+
+  function markFieldInvalid(field, isInvalid) {
+    if (!field) {
+      return;
+    }
+    field.classList.toggle('is-invalid', !!isInvalid);
+  }
+
+  function validateRequiredFields() {
+    var email = (emailInput && emailInput.value || '').trim();
+    var password = (passwordInput && passwordInput.value || '').trim();
+    var emailMissing = !email;
+    var passwordMissing = !password;
+
+    markFieldInvalid(emailInput, emailMissing);
+    markFieldInvalid(passwordInput, passwordMissing);
+
+    return !(emailMissing || passwordMissing);
+  }
+
+  function notify(type, message) {
+    if (window.alertify) {
+      var now = Date.now();
+      var key = type + '::' + message;
+      if (key === lastNotifyKey && now - lastNotifyAt < 1000) {
+        return;
+      }
+      lastNotifyKey = key;
+      lastNotifyAt = now;
+
+      window.alertify.set('notifier', 'position', 'top-right');
+      window.alertify.set('notifier', 'delay', 2.2);
+      if (typeof window.alertify.dismissAll === 'function') {
+        window.alertify.dismissAll();
+      }
+      window.alertify.notify(message, type, 2.2);
+      return;
+    }
+    if (type === 'success') {
+      console.log(message);
+    } else {
+      console.warn(message);
+    }
+  }
 
   function clearTransientState() {
     var container = document.querySelector('.container');
@@ -93,15 +142,37 @@
 
   window.addEventListener('resize', resizeRiveSurface);
 
+  if (emailInput) {
+    emailInput.addEventListener('input', function() {
+      markFieldInvalid(emailInput, false);
+    });
+  }
+
+  if (passwordInput) {
+    passwordInput.addEventListener('input', function() {
+      markFieldInvalid(passwordInput, false);
+    });
+  }
+
   // Form handlers mínimos (no hacen autenticación real)
   document.getElementById('btnLogin').addEventListener('click', function(){
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+    if (!validateRequiredFields()) {
+      setLoginResultAnimation('error');
+      notify('error', 'Completa email y password');
+      return;
+    }
+
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
     const loginOk = email.indexOf('@') > 0 && password.length >= 4;
 
     setLoginResultAnimation(loginOk ? 'success' : 'error');
 
-    alert((loginOk ? 'Login exitoso: ' : 'Login fallido: ') + email + '\n(Este es un demo local, no hace login real)');
+    if (loginOk) {
+      notify('success', 'Login exitoso para ' + email + ' (demo local)');
+    } else {
+      notify('error', 'Login fallido: revisa correo y contraseña');
+    }
   });
 
   document.getElementById('btnTestError').addEventListener('click', function(){
