@@ -92,7 +92,7 @@ input.is-invalid{border-color:#ef4444;box-shadow:0 0 0 3px rgba(239, 68, 68, .16
 }
 
 .container.is-success #rive-canvas{
-	animation: successCanvasPop 900ms cubic-bezier(.16,.84,.24,1);
+	animation: successCanvasPop 900ms cubic-bezier(.16,.84,.24,1) forwards;
 }
 
 .container.is-error .rive-stage::after{
@@ -124,9 +124,9 @@ input.is-invalid{border-color:#ef4444;box-shadow:0 0 0 3px rgba(239, 68, 68, .16
 
 @keyframes successPulse{
 	0%{transform:translateY(0) rotate(0deg) scale(1)}
-	20%{transform:translateY(-18px) rotate(-2.4deg) scale(1.035)}
-	42%{transform:translateY(-4px) rotate(1.6deg) scale(1.01)}
-	65%{transform:translateY(-10px) rotate(-.8deg) scale(1.02)}
+	20%{transform:translateY(-18px) rotate(-2.4deg) scale(1.055)}
+	42%{transform:translateY(-4px) rotate(1.6deg) scale(1.02)}
+	65%{transform:translateY(-10px) rotate(-.8deg) scale(1.03)}
 	100%{transform:translateY(0) rotate(0deg) scale(1)}
 }
 
@@ -138,9 +138,9 @@ input.is-invalid{border-color:#ef4444;box-shadow:0 0 0 3px rgba(239, 68, 68, .16
 
 @keyframes successCanvasPop{
 	0%{transform:translateY(0) scale(1);filter:saturate(1) brightness(1)}
-	24%{transform:translateY(-14px) scale(1.03);filter:saturate(1.35) brightness(1.16)}
-	52%{transform:translateY(-3px) scale(1.01);filter:saturate(1.16) brightness(1.08)}
-	100%{transform:translateY(0) scale(1);filter:saturate(1) brightness(1)}
+	24%{transform:translateY(-14px) scale(1.12);filter:saturate(1.35) brightness(1.16)}
+	52%{transform:translateY(-3px) scale(1.08);filter:saturate(1.16) brightness(1.08)}
+	100%{transform:translateY(0) scale(1.22);filter:saturate(1.02) brightness(1.02)}
 }
 
 @keyframes successRingPulse{
