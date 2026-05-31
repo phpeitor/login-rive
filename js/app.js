@@ -35,10 +35,12 @@
   var googleOneTapPrompted = false;
   var googleIdentityInitialized = false;
   var sessionStorageKey = 'login_rive_google_expires_at';
+  var googleAuthLocked = false;
 
   var emailInput = document.getElementById('email');
   var passwordInput = document.getElementById('password');
   var googleButtonHost = document.getElementById('btnGoogleLocal');
+  var nativeGoogleButtonHost = document.getElementById('gSignInDiv');
 
   function base64UrlDecode(input) {
     var base64 = input.replace(/-/g, '+').replace(/_/g, '/');
@@ -192,6 +194,23 @@
       console.log(message);
     } else {
       console.warn(message);
+    }
+  }
+
+  function setGoogleAuthButtonsDisabled(disabled) {
+    googleAuthLocked = !!disabled;
+
+    if (googleButtonHost) {
+      googleButtonHost.disabled = !!disabled;
+      googleButtonHost.classList.toggle('is-disabled', !!disabled);
+      googleButtonHost.setAttribute('aria-disabled', disabled ? 'true' : 'false');
+      googleButtonHost.tabIndex = disabled ? -1 : 0;
+    }
+
+    if (nativeGoogleButtonHost) {
+      nativeGoogleButtonHost.classList.toggle('is-disabled', !!disabled);
+      nativeGoogleButtonHost.setAttribute('aria-disabled', disabled ? 'true' : 'false');
+      nativeGoogleButtonHost.tabIndex = disabled ? -1 : 0;
     }
   }
 
@@ -413,6 +432,8 @@
       el.classList.add('visible');
     }
 
+    setGoogleAuthButtonsDisabled(true);
+
     if (window.localStorage) {
       var expiresAt = Math.floor(Date.now() / 1000) + remaining;
       window.localStorage.setItem(sessionStorageKey, String(expiresAt));
@@ -444,6 +465,7 @@
           .then(function(res){ return res.json().catch(function(){ return { ok: false }; }); })
           .then(function(data){
             if (data && data.ok) {
+              setGoogleAuthButtonsDisabled(false);
               notify('success', 'Sesión destruida (prueba). Recargando...');
               window.setTimeout(function(){ window.location.reload(); }, 900);
             } else {
@@ -480,14 +502,17 @@
             if (expiresAt && !isNaN(parseInt(expiresAt, 10))) {
               var remaining = parseInt(expiresAt, 10) - parseInt(now, 10);
               if (remaining <= 0) {
+                setGoogleAuthButtonsDisabled(false);
                 fetch('./php/logout.php', { method: 'POST', credentials: 'same-origin' }).then(function(){ window.location.reload(); });
                 return;
               }
+              setGoogleAuthButtonsDisabled(true);
               startSessionTimer(remaining);
               return;
             }
 
             // Fallback muy conservador si no hay información de expiración
+            setGoogleAuthButtonsDisabled(false);
             startSessionTimer(60);
           }
         }).catch(function(err){
