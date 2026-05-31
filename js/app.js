@@ -34,6 +34,7 @@
   var googleSignInReady = false;
   var googleOneTapPrompted = false;
   var googleIdentityInitialized = false;
+  var sessionStorageKey = 'login_rive_google_expires_at';
 
   var emailInput = document.getElementById('email');
   var passwordInput = document.getElementById('password');
@@ -412,6 +413,11 @@
       el.classList.add('visible');
     }
 
+    if (window.localStorage) {
+      var expiresAt = Math.floor(Date.now() / 1000) + remaining;
+      window.localStorage.setItem(sessionStorageKey, String(expiresAt));
+    }
+
     // Notificar inicio (opcional)
     notify('info', 'Sesión activa. Se cerrará en ' + remaining + 's (prueba)');
 
@@ -430,6 +436,9 @@
         clearInterval(_sessionTimerId);
         _sessionTimerId = null;
         if (el) { el.classList.remove('visible'); el.classList.add('hidden'); }
+        if (window.localStorage) {
+          window.localStorage.removeItem(sessionStorageKey);
+        }
         // Llamar al endpoint que destruye la sesión en el servidor
         fetch('./php/logout.php', { method: 'POST', credentials: 'same-origin' })
           .then(function(res){ return res.json().catch(function(){ return { ok: false }; }); })
@@ -457,7 +466,28 @@
             var name = data.user.name || data.user.email || 'Cuenta Google';
             notify('success', 'Bienvenido ' + name);
             try { setLoginResultAnimation('success'); } catch(e){}
-            // iniciar temporizador de 60s para pruebas
+
+            var now = data.now || Math.floor(Date.now() / 1000);
+            var expiresAt = data.expires_at;
+
+            if ((!expiresAt || isNaN(parseInt(expiresAt, 10))) && window.localStorage) {
+              var storedExpiresAt = parseInt(window.localStorage.getItem(sessionStorageKey), 10);
+              if (!isNaN(storedExpiresAt)) {
+                expiresAt = storedExpiresAt;
+              }
+            }
+
+            if (expiresAt && !isNaN(parseInt(expiresAt, 10))) {
+              var remaining = parseInt(expiresAt, 10) - parseInt(now, 10);
+              if (remaining <= 0) {
+                fetch('./php/logout.php', { method: 'POST', credentials: 'same-origin' }).then(function(){ window.location.reload(); });
+                return;
+              }
+              startSessionTimer(remaining);
+              return;
+            }
+
+            // Fallback muy conservador si no hay información de expiración
             startSessionTimer(60);
           }
         }).catch(function(err){
