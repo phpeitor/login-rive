@@ -2,16 +2,10 @@
 // OAuth callback: exchange code for tokens and create session
 session_start();
 
-$envPath = dirname(__DIR__) . DIRECTORY_SEPARATOR . '.env';
-$clientId = getenv('GOOGLE_CLIENT_ID') ?: '';
-$clientSecret = getenv('GOOGLE_SECRET_KEY') ?: '';
-if (file_exists($envPath)) {
-    $parsed = parse_ini_file($envPath, false, INI_SCANNER_RAW);
-    if (is_array($parsed)) {
-        if (empty($clientId) && !empty($parsed['GOOGLE_CLIENT_ID'])) $clientId = trim((string)$parsed['GOOGLE_CLIENT_ID']);
-        if (empty($clientSecret) && !empty($parsed['GOOGLE_SECRET_KEY'])) $clientSecret = trim((string)$parsed['GOOGLE_SECRET_KEY']);
-    }
-}
+require_once __DIR__ . '/bootstrap.php';
+
+$clientId = trim((string) app_env('GOOGLE_CLIENT_ID', ''));
+$clientSecret = trim((string) app_env('GOOGLE_SECRET_KEY', ''));
 
 if (empty($clientId) || empty($clientSecret)) {
     echo 'Missing client id or secret in server configuration.';
@@ -79,14 +73,9 @@ $_SESSION['google_user'] = [
 
 // Set a session expiration timestamp (seconds since epoch).
 // Read optional SESSION_LIFETIME from .env (seconds), default to 3600 (1 hour).
-$envPath = dirname(__DIR__) . DIRECTORY_SEPARATOR . '.env';
-$sessionLifetime = 3600;
-if (file_exists($envPath)) {
-    $parsed = parse_ini_file($envPath, false, INI_SCANNER_RAW);
-    if (is_array($parsed) && !empty($parsed['SESSION_LIFETIME'])) {
-        $sessionLifetime = (int) $parsed['SESSION_LIFETIME'];
-        if ($sessionLifetime <= 0) $sessionLifetime = 3600;
-    }
+$sessionLifetime = (int) app_env('SESSION_LIFETIME', 3600);
+if ($sessionLifetime <= 0) {
+    $sessionLifetime = 3600;
 }
 $_SESSION['google_expires_at'] = time() + $sessionLifetime;
 

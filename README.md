@@ -6,95 +6,100 @@
   <img src="https://www.nepaltraveladventure.com/blog/wp-content/uploads/2020/12/download-1.png" alt="Instagram" width="600">
 </a>
 
-Demo local de login UI animado con Rive, enfocado en UX visual para estados de autenticación (`idle`, `error`, `success`).
+Demo local de login UI animado con Rive y autenticación Google, enfocado en estados visuales y experiencia de usuario.
 
-## Objetivo
+## Qué incluye
 
-Este proyecto muestra cómo integrar una animación `.riv` con un formulario de login en frontend puro (HTML, CSS y JavaScript), incluyendo:
+- Animación principal con Rive.
+- Botón nativo de Google Identity Services.
+- Botón personalizado que usa flujo OAuth server-side.
+- Manejo de sesión con contador visible.
+- Validación demo del formulario local.
 
-- validación visual de campos;
-- feedback de error y éxito con animaciones del personaje;
-- notificaciones con Alertify para mensajes de resultado.
+## Requisitos
 
-## Estructura del proyecto
+- PHP 8.0 o superior.
+- Composer.
+- Apache, Nginx o cualquier servidor capaz de ejecutar PHP.
+- Un OAuth Client ID de Google configurado para navegador web.
 
-- `index.html`: entrada principal del demo.
-- `css/styles.css`: estilos, layout y animaciones UX.
-- `js/app.js`: lógica del login demo, validaciones y control de estados.
-- `js/rive.js`: runtime JS de Rive.
-- `php/google-config.php`: bridge PHP que expone `GOOGLE_CLIENT_ID` desde `.env`.
-- `resources/`: archivos de animación y assets visuales.
+## Levantar el proyecto
 
-Contenido relevante actual en `resources/`:
+1. Clona o copia el proyecto en tu servidor local.
+2. Instala dependencias PHP:
 
-- `marty_purple_loop.riv`
-- `animate-success.riv`
-- `reactions_v3.riv`
-- `popout.riv`
-- `open-in-rive.riv`
-- `rive.wasm`
-- `rive_logo_black.svg`
-- `signin-google.png`
-
-## Cómo funciona
-
-1. `index.html` carga estilos, runtime de Rive, `php/google-config.php` y `js/app.js`.
-2. `php/google-config.php` publica `GOOGLE_CLIENT_ID` desde `.env` como configuración JavaScript.
-3. `js/app.js` configura la URL local del WASM (`resources/rive.wasm`).
-4. Se inicializa una instancia de Rive con `marty_purple_loop.riv` y, en `success`, se cambia temporalmente a `animate-success.riv`.
-5. Al interactuar con el formulario se aplican clases de estado en `.container`:
-	 - `is-error`
-	 - `is-success`
-6. `css/styles.css` traduce esas clases a efectos visuales del personaje y del stage.
-
-## Reglas de validación en el demo
-
-- Si los campos están vacíos:
-	- se marcan con borde de error;
-	- no se dispara animación de error;
-	- no se muestra notificación Alertify.
-- Si los campos tienen datos pero no cumplen validación:
-	- se dispara estado `error`;
-	- se muestra notificación `error`.
-- Si el login pasa validación demo:
-	- se dispara estado `success` con animación reforzada;
-	- se muestra notificación `success`.
-
-Validación demo actual:
-
-- email debe contener `@`
-- password debe tener al menos 4 caracteres
-
-## Ejecución local
-
-Sirve el proyecto desde un servidor local (Apache, Nginx, `live-server`, etc.) y abre:
-
-- `http://127.0.0.1/login-rive/`
-
-También funciona con rutas equivalentes como:
-
-- `http://localhost/login-rive/`
-
-## Personalización rápida
-
-### Cambiar animación principal
-
-Edita en `js/app.js`:
-
-```js
-src: './resources/marty_purple_loop.riv'
+```bash
+composer install
 ```
 
-### Ajustar intensidad visual de estados
+3. Configura el archivo `.env` en la raíz del proyecto:
 
-Edita en `css/styles.css`:
+```env
+GOOGLE_CLIENT_ID=tu_client_id
+GOOGLE_SECRET_KEY=tu_client_secret
+SESSION_LIFETIME=60
+```
 
-- `@keyframes error...` para feedback de error.
-- `@keyframes success...` para feedback de éxito.
+4. En Google Cloud Console agrega:
+- Authorized JavaScript origins: `http://127.0.0.1` y/o `http://localhost`
+- Authorized redirect URIs: `http://127.0.0.1/login-rive/php/oauth-callback.php` y/o `http://localhost/login-rive/php/oauth-callback.php`
 
-## Notas técnicas
+5. Abre el proyecto en el navegador:
 
-- Mantén compatibilidad entre `js/rive.js` y `resources/rive.wasm`.
-- Usa una sola instancia de Rive por vista para mejor rendimiento.
-- Si cambias tamaños de layout, mantén `resizeDrawingSurfaceToCanvas()` en `app.js`.
-- Para `.env` en PHP simple, `parse_ini_file()` alcanza; si más adelante hay más variables o capas, usa Composer con `vlucas/phpdotenv`.
+```text
+http://127.0.0.1/login-rive/
+```
+
+## Flujo de uso
+
+1. `index.html` carga el runtime de Rive, Alertify y la configuración PHP de Google.
+2. `php/google-config.php` expone `GOOGLE_CLIENT_ID` al frontend.
+3. `js/app.js` inicializa el botón nativo y el botón personalizado.
+4. El flujo nativo valida el token en frontend y crea sesión vía backend.
+5. El flujo personalizado redirige a `php/oauth-start.php` y vuelve por `php/oauth-callback.php`.
+6. `php/session.php` devuelve el estado actual de la sesión y el tiempo restante.
+7. `php/logout.php` destruye la sesión al expirar el tiempo configurado.
+
+## Estructura principal
+
+- `index.html`: entrada principal.
+- `css/styles.css`: estilos y estados visuales.
+- `js/app.js`: lógica de UI, Google auth y sesión.
+- `js/rive.js`: runtime de Rive.
+- `php/bootstrap.php`: bootstrap común para Composer y `.env`.
+- `php/google-config.php`: expone `GOOGLE_CLIENT_ID` al navegador.
+- `php/oauth-start.php`: inicia OAuth server-side.
+- `php/oauth-callback.php`: procesa el callback y crea sesión.
+- `php/validate-google.php`: valida el token del flujo nativo.
+- `php/session.php`: consulta la sesión activa.
+- `php/logout.php`: destruye la sesión.
+- `resources/`: animaciones y assets.
+
+## Archivos PHP actuales
+
+- `php/bootstrap.php`
+- `php/google-config.php`
+- `php/oauth-start.php`
+- `php/oauth-callback.php`
+- `php/validate-google.php`
+- `php/session.php`
+- `php/logout.php`
+
+## Notas
+
+- El `.env` ahora se carga con Composer usando `vlucas/phpdotenv`.
+- Si cambias la duración de sesión, ajusta `SESSION_LIFETIME`.
+- Si el contador no coincide con tu login, cierra sesión y vuelve a entrar para regenerar `expires_at`.
+- Mantén sincronizados `resources/rive.wasm` y `js/rive.js`.
+
+## Comandos útiles
+
+```bash
+composer install
+```
+
+```bash
+php -S 127.0.0.1:8000
+```
+
+Si usas Apache local, basta con abrir el proyecto desde `http://127.0.0.1/login-rive/`.

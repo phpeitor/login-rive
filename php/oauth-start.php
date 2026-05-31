@@ -2,14 +2,9 @@
 // Start OAuth 2.0 Authorization Code flow with Google (server-side)
 // Redirects the user to Google's consent screen.
 
-$envPath = dirname(__DIR__) . DIRECTORY_SEPARATOR . '.env';
-$clientId = getenv('GOOGLE_CLIENT_ID') ?: '';
-if (!$clientId && file_exists($envPath)) {
-    $parsed = parse_ini_file($envPath, false, INI_SCANNER_RAW);
-    if (is_array($parsed) && !empty($parsed['GOOGLE_CLIENT_ID'])) {
-        $clientId = trim((string) $parsed['GOOGLE_CLIENT_ID']);
-    }
-}
+require_once __DIR__ . '/bootstrap.php';
+
+$clientId = trim((string) app_env('GOOGLE_CLIENT_ID', ''));
 
 if (!$clientId) {
     http_response_code(500);

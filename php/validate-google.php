@@ -1,18 +1,13 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 
+require_once __DIR__ . '/bootstrap.php';
+
 // Simple backend validator for Google id_token (JWT)
 // Usage: POST { id_token: '...' }
 
 // Read client id from env or .env
-$envPath = dirname(__DIR__) . DIRECTORY_SEPARATOR . '.env';
-$clientId = getenv('GOOGLE_CLIENT_ID') ?: '';
-if (!$clientId && file_exists($envPath)) {
-    $parsed = parse_ini_file($envPath, false, INI_SCANNER_RAW);
-    if (is_array($parsed) && !empty($parsed['GOOGLE_CLIENT_ID'])) {
-        $clientId = trim((string) $parsed['GOOGLE_CLIENT_ID']);
-    }
-}
+$clientId = trim((string) app_env('GOOGLE_CLIENT_ID', ''));
 
 $input = null;
 $raw = file_get_contents('php://input');
