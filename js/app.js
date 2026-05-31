@@ -69,17 +69,27 @@
     }
   }
 
+  function formatGoogleUserLabel(user) {
+    var safeUser = user || {};
+    var name = safeUser.name || safeUser.given_name || 'Cuenta Google';
+    var email = safeUser.email || 'correo no disponible';
+
+    return 'Nombre: ' + name + ' Correo: ' + email;
+  }
+
   function alertGoogleAccountName(credential) {
     var payload = parseJwtPayload(credential);
     var name = payload && (payload.name || payload.given_name || payload.email) ? (payload.name || payload.given_name || payload.email) : 'Cuenta Google';
+    var email = payload && payload.email ? payload.email : 'correo no disponible';
+    var message = 'Nombre: ' + name + ' Correo: ' + email;
 
     notify('success', 'Bienvenido ' + name + '');
     if (window.alertify && typeof window.alertify.alert === 'function') {
-      window.alertify.alert('Ingreso con Google', 'Ingreso con Google: ' + name);
+      window.alertify.alert('Ingreso con Google', message);
       return;
     }
 
-    window.alert('Ingreso con Google: ' + name);
+    window.alert( message);
   }
 
   function handleGoogleCredentialResponse(response) {
@@ -98,12 +108,13 @@
         return res.json().catch(function(){ return { ok: false, error: 'invalid_response' }; });
       }).then(function(data) {
         if (data && data.ok) {
+          var userMessage = formatGoogleUserLabel(data.payload);
           var name = (data.payload && (data.payload.name || data.payload.email)) ? (data.payload.name || data.payload.email) : 'Cuenta Google';
           notify('success', 'Bienvenido ' + name);
           if (window.alertify && typeof window.alertify.alert === 'function') {
-            window.alertify.alert('Ingreso con Google', 'Ingreso con Google: ' + name);
+            window.alertify.alert('Ingreso con Google', userMessage);
           } else {
-            alert('Ingreso con Google: ' + name);
+            alert(userMessage);
           }
         } else {
           notify('error', 'Validación en servidor fallida: ' + (data && data.error ? data.error : 'unknown'));
@@ -486,8 +497,15 @@
         .then(function(data){
           if (data && data.ok && data.user) {
             var name = data.user.name || data.user.email || 'Cuenta Google';
+            var userMessage = formatGoogleUserLabel(data.user);
             notify('success', 'Bienvenido ' + name);
             try { setLoginResultAnimation('success'); } catch(e){}
+
+            if (window.alertify && typeof window.alertify.alert === 'function') {
+              window.alertify.alert('Ingreso con Google', userMessage);
+            } else {
+              alert( userMessage);
+            }
 
             var now = data.now || Math.floor(Date.now() / 1000);
             var expiresAt = data.expires_at;
