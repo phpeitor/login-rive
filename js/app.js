@@ -74,14 +74,14 @@
     var name = safeUser.name || safeUser.given_name || 'Cuenta Google';
     var email = safeUser.email || 'correo no disponible';
 
-    return 'Nombre: ' + name + ' Correo: ' + email;
+    return 'Nombre: ' + name + '<br>Correo: ' + email;
   }
 
   function alertGoogleAccountName(credential) {
     var payload = parseJwtPayload(credential);
     var name = payload && (payload.name || payload.given_name || payload.email) ? (payload.name || payload.given_name || payload.email) : 'Cuenta Google';
     var email = payload && payload.email ? payload.email : 'correo no disponible';
-    var message = 'Nombre: ' + name + ' Correo: ' + email;
+    var message = 'Nombre: ' + name + '<br>Correo: ' + email;
 
     notify('success', 'Bienvenido ' + name + '');
     if (window.alertify && typeof window.alertify.alert === 'function') {
@@ -89,7 +89,7 @@
       return;
     }
 
-    window.alert( message);
+    window.alert('Ingreso con Google: Nombre: ' + name + '\nCorreo: ' + email);
   }
 
   function handleGoogleCredentialResponse(response) {
